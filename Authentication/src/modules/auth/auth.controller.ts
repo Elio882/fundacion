@@ -5,12 +5,17 @@ import {
   Request,
   UseGuards,
   Get,
+  Body,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { JwtAuthGuard } from './jwt-auth.guard';
-import { LocalAuthGuard } from './local-auth.guard';
+//import { JwtAuthGuard } from '../../guard/auth.guard';
+//import { LocalAuthGuard } from '../../guard/local-auth.guard';
+import { AuthGuard } from 'src/guard/auth.guard';
+import { LoginUser } from './dto/auth.dto';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('auth')
+@ApiBearerAuth()
 export class AuthController {
   logger: Logger;
   constructor(
@@ -20,17 +25,17 @@ export class AuthController {
   }
 
   @Post('login')
-  @UseGuards(LocalAuthGuard)
-  async login(@Request() req): Promise<any> {
+  //@UseGuards(LocalAuthGuard)
+  async login(@Body() loginUser: LoginUser): Promise<any> {
     try {
       //return req.user;
-      return await this.authService.generateJwtToken(req.user);
+      return await this.authService.generateJwtToken(loginUser);
     } catch (error) {
       throw error;
     }
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AuthGuard)
   @Get('viewProfile')
   async getUser(@Request() req): Promise<any> {
     return req.user;

@@ -24,9 +24,16 @@ export class AuthService {
     if (!isMatched) throw new UnauthorizedException('Invalid Password');
     return user;
   }
+
+  validateToken(token: string) {
+    return this.jwtService.verify(token, {
+      secret: 'JWT_SECRET',
+    });
+  }
+
   async generateJwtToken(user: any) {
     const payload = {
-      email: user.email
+      email: user.email,
     };
     return {
       access_token: this.jwtService.sign(payload),
